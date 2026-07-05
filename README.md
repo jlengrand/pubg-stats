@@ -19,6 +19,24 @@ calls.
   re-ingests but still respects that cache TTL.
 - Exposes a health check at `/actuator/health`.
 
+## Prerequisites
+
+- **Docker + Docker Compose** — the only requirement to run the app; the image
+  builds the app and starts Postgres for you.
+- **A PUBG API key** — optional. Without one the app runs off seed data.
+- For local (non-Docker) development: **JDK 23** (`./gradlew` on JDK 25 breaks the
+  bundled Gradle 8.10.2, so point `JAVA_HOME` at 23) and a running Postgres.
+
+## Getting a PUBG API key
+
+1. Go to https://developer.pubg.com/ and sign in (or create a free account).
+2. Open the **API Keys** section and create a new key.
+3. Copy it into `.env` as `PUBG_API_KEY=…`.
+
+The key is free and rate-limited (10 requests/minute on the default tier), which
+is why stats are cached for `pubg.cache-ttl-hours`. Leave it blank to skip the
+API entirely and run on seed data.
+
 ## .env setup
 
 Copy the example and adjust if needed:
