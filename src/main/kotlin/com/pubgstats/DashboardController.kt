@@ -9,11 +9,16 @@ import org.springframework.web.bind.annotation.PostMapping
 class DashboardController(
     private val repository: PlayerStatsRepository,
     private val ingestion: StatsIngestionService,
+    private val baselineService: ProBaselineService,
+    private val coach: CoachService,
 ) {
     @GetMapping("/")
     fun dashboard(model: Model): String {
-        model.addAttribute("you", repository.findByPlayerName("you"))
+        val you = repository.findByPlayerName("you")
+        val baseline = baselineService.compute()
+        model.addAttribute("you", you)
         model.addAttribute("pros", repository.findByIsProTrue())
+        model.addAttribute("suggestions", if (you != null) coach.coach(you, baseline) else emptyList<Suggestion>())
         return "dashboard"
     }
 

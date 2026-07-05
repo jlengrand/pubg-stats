@@ -85,3 +85,49 @@ thead th {
 }
 
 tbody tr:last-child td { border-bottom: none; }
+
+.coaching {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+.tip {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--muted);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+}
+
+.tip.gap-high { border-left-color: #e5484d; }
+.tip.gap-mid  { border-left-color: #f2a900; }
+.tip.gap-low  { border-left-color: #46a758; }
+
+.tip-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.tip-metric { font-weight: 600; }
+
+.tip-gap {
+    font-weight: 700;
+    color: #e5484d;
+}
+.gap-mid .tip-gap { color: #f2a900; }
+.gap-low .tip-gap { color: #46a758; }
+
+.tip-vals {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.3rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.tip-text {
+    margin: 0.6rem 0 0;
+    font-size: 0.9rem;
+}

@@ -25,6 +25,24 @@
         </dl>
     </section>
 
+    <section class="card" th:if="${!suggestions.isEmpty()}">
+        <h2>Coaching</h2>
+        <div class="coaching">
+            <div class="tip" th:each="s : ${suggestions}"
+                 th:classappend="${s.gap >= 0.3} ? 'gap-high' : (${s.gap >= 0.15} ? 'gap-mid' : 'gap-low')">
+                <div class="tip-head">
+                    <span class="tip-metric" th:text="${s.metric}">Headshot Ratio</span>
+                    <span class="tip-gap" th:text="'-' + ${#numbers.formatDecimal(s.gap * 100, 1, 0)} + '%'">-40%</span>
+                </div>
+                <div class="tip-vals">
+                    <span th:text="'You: ' + ${#numbers.formatDecimal(s.userValue, 1, 2)}">You: 0.22</span>
+                    <span th:text="'Pro: ' + ${#numbers.formatDecimal(s.baselineValue, 1, 2)}">Pro: 0.41</span>
+                </div>
+                <p class="tip-text" th:text="${s.tip}">Spend time on aim training.</p>
+            </div>
+        </div>
+    </section>
+
     <section class="card">
         <h2>Pros</h2>
         <table>
