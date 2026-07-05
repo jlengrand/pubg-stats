@@ -22,7 +22,8 @@ class DashboardController(
 
     @GetMapping("/")
     fun dashboard(model: Model): String {
-        val you = repository.findByPlayerName("you")
+        // First configured player is the user; seed-data mode has no players list, so fall back to "you".
+        val you = repository.findByPlayerName(props.players.firstOrNull() ?: "you")
         val baseline = baselineService.compute()
         model.addAttribute("you", you)
         model.addAttribute("pros", repository.findByIsProTrue())
