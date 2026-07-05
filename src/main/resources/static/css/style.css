@@ -41,6 +41,36 @@ h2 {
     margin-bottom: 1.5rem;
 }
 
+.card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.card-head h2 { margin: 0; }
+
+.badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+}
+
+.badge.fresh { color: #46a758; border-color: #46a758; }
+.badge.cached { color: var(--muted); }
+
+.meta {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin: 0.4rem 0 1.1rem;
+}
+
+.table-scroll { overflow-x: auto; }
+
 .stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -130,4 +160,11 @@ tbody tr:last-child td { border-bottom: none; }
 .tip-text {
     margin: 0.6rem 0 0;
     font-size: 0.9rem;
+}
+
+@media (max-width: 560px) {
+    .wrap { padding: 1.25rem 0.85rem; }
+    .card { padding: 1rem 1rem; }
+    .stats dd { font-size: 1.3rem; }
+    th, td { padding: 0.5rem 0.5rem; }
 }
