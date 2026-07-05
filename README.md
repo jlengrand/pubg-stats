@@ -4,13 +4,19 @@ A self-hosted dashboard that puts your PUBG stats next to the pros' so you can
 see where you're bleeding rounds. It's a Spring Boot (Kotlin) app backed by
 Postgres, rendering a server-side Thymeleaf dashboard.
 
-Until real PUBG API ingestion lands (a later phase), the app boots with seed
-data so it runs end-to-end with zero external calls.
+With a `PUBG_API_KEY` set, it ingests real stats for the handles in
+`PUBG_PLAYERS` on startup (cached, so repeat boots don't re-hit the API). With a
+blank key it falls back to seed data so it runs end-to-end with zero external
+calls.
 
 ## What it does
 
 - Stores per-player stats: K/D, avg survival time, headshot %, win %, avg damage.
-- Renders a dashboard at `/` showing **you** vs a table of **pro** players.
+- Renders a dashboard at `/` showing **you** (first handle in `PUBG_PLAYERS`) vs
+  a table of **pro** players (the rest).
+- Ingests stats from the PUBG API on startup, caching each row for
+  `pubg.cache-ttl-hours` (default 24h); a **Refresh stats** button (`POST /refresh`)
+  re-ingests but still respects that cache TTL.
 - Exposes a health check at `/actuator/health`.
 
 ## .env setup
@@ -26,11 +32,12 @@ cp .env.example .env
 | `SPRING_DATASOURCE_URL` | Postgres JDBC URL | `jdbc:postgresql://localhost:5432/pubgstats` |
 | `SPRING_DATASOURCE_USERNAME` | DB user | `pubgstats` |
 | `SPRING_DATASOURCE_PASSWORD` | DB password | `pubgstats` |
-| `PUBG_API_KEY` | PUBG API key — used in a later phase | *(blank)* |
+| `PUBG_API_KEY` | PUBG API key — blank falls back to seed data | *(blank)* |
 | `PUBG_SHARD` | PUBG platform shard, e.g. `steam` | `steam` |
+| `PUBG_PLAYERS` | Comma-separated handles; first is **you**, the rest are pros | `shroud,chocoTaco,TGLTN,WackyJacky101,Pio` |
 
-The three `SPRING_DATASOURCE_*` vars are read by `application.yml`. A blank
-`PUBG_API_KEY` is fine today — the app falls back to seed data and won't crash.
+All the above are read by `application.yml`. A blank `PUBG_API_KEY` is fine —
+the app falls back to seed data and won't crash.
 
 ## Run it
 
