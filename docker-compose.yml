@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: pubgstats
+      POSTGRES_USER: pubgstats
+      POSTGRES_PASSWORD: pubgstats
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pubgstats"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pubgstats
+      SPRING_DATASOURCE_USERNAME: pubgstats
+      SPRING_DATASOURCE_PASSWORD: pubgstats
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
