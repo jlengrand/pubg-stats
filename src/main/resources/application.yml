@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/pubgstats}
+    username: ${SPRING_DATASOURCE_USERNAME:pubgstats}
+    password: ${SPRING_DATASOURCE_PASSWORD:pubgstats}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
