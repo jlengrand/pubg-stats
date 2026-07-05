@@ -10,37 +10,74 @@
 <main class="wrap">
     <h1>PUBG Stats</h1>
 
+    <form method="post" th:action="@{/refresh}">
+        <button type="submit">Refresh stats</button>
+    </form>
+
+    <div class="banner" th:if="${banner}" th:text="${banner}">Heads up.</div>
+
+    <section class="card empty" th:if="${you == null}">
+        <h2>No stats yet</h2>
+        <p class="meta">Nothing has been ingested for your player. Click <strong>Refresh stats</strong> to pull data from the PUBG API.</p>
+    </section>
+
     <section class="card" th:if="${you}">
-        <h2 th:text="${you.playerName}">you</h2>
+        <div class="card-head">
+            <h2 th:text="${you.playerName}">you</h2>
+            <span class="badge" th:classappend="${fresh} ? 'fresh' : 'cached'"
+                  th:text="${fresh} ? 'fresh' : 'cached'">fresh</span>
+        </div>
+        <p class="meta" th:text="'Stats as of ' + ${youFetchedAt}">Stats as of 2026-07-05 12:00</p>
         <dl class="stats">
-            <div><dt>K/D</dt><dd th:text="${#numbers.formatDecimal(you.kd, 1, 2)}">1.80</dd></div>
-            <div><dt>Avg survival</dt><dd th:text="${you.avgSurvivalTimeSeconds} + 's'">840s</dd></div>
+            <div><dt>K/D</dt><dd th:text="${#numbers.formatDecimal(you.kd, 1, 1)}">1.8</dd></div>
+            <div><dt>Avg survival</dt><dd th:text="${you.avgSurvivalTimeSeconds / 60} + ':' + ${#numbers.formatInteger(you.avgSurvivalTimeSeconds % 60, 2)}">14:00</dd></div>
             <div><dt>Headshot %</dt><dd th:text="${#numbers.formatPercent(you.headshotRatio, 1, 0)}">22%</dd></div>
             <div><dt>Win %</dt><dd th:text="${#numbers.formatPercent(you.winRatio, 1, 0)}">6%</dd></div>
             <div><dt>Avg damage</dt><dd th:text="${#numbers.formatDecimal(you.avgDamage, 1, 0)}">210</dd></div>
         </dl>
     </section>
 
+    <section class="card" th:if="${!suggestions.isEmpty()}">
+        <h2>Coaching</h2>
+        <div class="coaching">
+            <div class="tip" th:each="s : ${suggestions}"
+                 th:classappend="${s.gap >= 0.3} ? 'gap-high' : (${s.gap >= 0.15} ? 'gap-mid' : 'gap-low')">
+                <div class="tip-head">
+                    <span class="tip-metric" th:text="${s.metric}">Headshot Ratio</span>
+                    <span class="tip-gap" th:text="'-' + ${#numbers.formatDecimal(s.gap * 100, 1, 0)} + '%'">-40%</span>
+                </div>
+                <div class="tip-vals">
+                    <span th:text="'You: ' + ${#numbers.formatDecimal(s.userValue, 1, 2)}">You: 0.22</span>
+                    <span th:text="'Pro: ' + ${#numbers.formatDecimal(s.baselineValue, 1, 2)}">Pro: 0.41</span>
+                </div>
+                <p class="tip-text" th:text="${s.tip}">Spend time on aim training.</p>
+            </div>
+        </div>
+    </section>
+
     <section class="card">
         <h2>Pros</h2>
-        <table>
-            <thead>
-            <tr>
-                <th>Player</th><th>K/D</th><th>Avg survival</th>
-                <th>Headshot %</th><th>Win %</th><th>Avg damage</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="p : ${pros}">
-                <td th:text="${p.playerName}">shroud</td>
-                <td th:text="${#numbers.formatDecimal(p.kd, 1, 2)}">6.40</td>
-                <td th:text="${p.avgSurvivalTimeSeconds} + 's'">1180s</td>
-                <td th:text="${#numbers.formatPercent(p.headshotRatio, 1, 0)}">41%</td>
-                <td th:text="${#numbers.formatPercent(p.winRatio, 1, 0)}">18%</td>
-                <td th:text="${#numbers.formatDecimal(p.avgDamage, 1, 0)}">480</td>
-            </tr>
-            </tbody>
-        </table>
+        <p class="meta" th:if="${pros.isEmpty()}">No pro data yet — add pro handles to the configured player list and refresh.</p>
+        <div class="table-scroll" th:if="${!pros.isEmpty()}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Player</th><th>K/D</th><th>Avg survival</th>
+                    <th>Headshot %</th><th>Win %</th><th>Avg damage</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${pros}">
+                    <td th:text="${p.playerName}">shroud</td>
+                    <td th:text="${#numbers.formatDecimal(p.kd, 1, 1)}">6.4</td>
+                    <td th:text="${p.avgSurvivalTimeSeconds / 60} + ':' + ${#numbers.formatInteger(p.avgSurvivalTimeSeconds % 60, 2)}">19:40</td>
+                    <td th:text="${#numbers.formatPercent(p.headshotRatio, 1, 0)}">41%</td>
+                    <td th:text="${#numbers.formatPercent(p.winRatio, 1, 0)}">18%</td>
+                    <td th:text="${#numbers.formatDecimal(p.avgDamage, 1, 0)}">480</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </section>
 </main>
 </body>

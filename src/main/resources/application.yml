@@ -7,3 +7,13 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: false
+
+pubg:
+  api-key: ${PUBG_API_KEY:}
+  shard: ${PUBG_SHARD:steam}
+  base-url: https://api.pubg.com
+  cache-ttl-hours: 24
+  # Background refresh schedule (Spring cron). Default: daily at 03:00. Override with PUBG_REFRESH_CRON.
+  refresh-cron: ${PUBG_REFRESH_CRON:0 0 3 * * *}
+  # First entry is the user handle, the rest are pro players. Override with a comma-separated PUBG_PLAYERS.
+  players: ${PUBG_PLAYERS:shroud,chocoTaco,TGLTN,WackyJacky101,Pio}
