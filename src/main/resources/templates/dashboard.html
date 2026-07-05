@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUBG Stats</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<main class="wrap">
+    <h1>PUBG Stats</h1>
+
+    <section class="card" th:if="${you}">
+        <h2 th:text="${you.playerName}">you</h2>
+        <dl class="stats">
+            <div><dt>K/D</dt><dd th:text="${#numbers.formatDecimal(you.kd, 1, 2)}">1.80</dd></div>
+            <div><dt>Avg survival</dt><dd th:text="${you.avgSurvivalTimeSeconds} + 's'">840s</dd></div>
+            <div><dt>Headshot %</dt><dd th:text="${#numbers.formatPercent(you.headshotRatio, 1, 0)}">22%</dd></div>
+            <div><dt>Win %</dt><dd th:text="${#numbers.formatPercent(you.winRatio, 1, 0)}">6%</dd></div>
+            <div><dt>Avg damage</dt><dd th:text="${#numbers.formatDecimal(you.avgDamage, 1, 0)}">210</dd></div>
+        </dl>
+    </section>
+
+    <section class="card">
+        <h2>Pros</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Player</th><th>K/D</th><th>Avg survival</th>
+                <th>Headshot %</th><th>Win %</th><th>Avg damage</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${pros}">
+                <td th:text="${p.playerName}">shroud</td>
+                <td th:text="${#numbers.formatDecimal(p.kd, 1, 2)}">6.40</td>
+                <td th:text="${p.avgSurvivalTimeSeconds} + 's'">1180s</td>
+                <td th:text="${#numbers.formatPercent(p.headshotRatio, 1, 0)}">41%</td>
+                <td th:text="${#numbers.formatPercent(p.winRatio, 1, 0)}">18%</td>
+                <td th:text="${#numbers.formatDecimal(p.avgDamage, 1, 0)}">480</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>
