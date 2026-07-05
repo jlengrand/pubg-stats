@@ -53,6 +53,7 @@ cp .env.example .env
 | `PUBG_API_KEY` | PUBG API key — blank falls back to seed data | *(blank)* |
 | `PUBG_SHARD` | PUBG platform shard, e.g. `steam` | `steam` |
 | `PUBG_PLAYERS` | Comma-separated handles; first is **you**, the rest are pros | `shroud,chocoTaco,TGLTN,WackyJacky101,Pio` |
+| `PUBG_REFRESH_CRON` | Spring cron for the background stats refresh | `0 0 3 * * *` (daily 03:00) |
 
 All the above are read by `application.yml`. A blank `PUBG_API_KEY` is fine —
 the app falls back to seed data and won't crash.
