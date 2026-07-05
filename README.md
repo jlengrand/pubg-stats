@@ -58,13 +58,22 @@ docker compose down -v
 
 ## How coaching heuristics work
 
-Coaching is comparison-driven: the dashboard shows your row against pro rows on
-the same five metrics (K/D, avg survival, headshot %, win %, avg damage), so the
-biggest gaps read straight off the page — e.g. a K/D of 1.8 against a pro median
-near 5–6, or a 22% headshot rate against ~40%, points at aim and engagement
-discipline before it points at anything else.
+Coaching is comparison-driven across five metrics (K/D, avg survival,
+headshot %, win %, avg damage). Two services turn that comparison into ranked
+advice, surfaced on the dashboard:
 
-The seed data encodes the heuristic baseline: pros survive longer *and* deal
-more damage, which is the pattern to chase — staying alive isn't enough if the
-damage isn't there. Automated per-metric coaching tips (turning each gap into a
-worded recommendation) build on this comparison and land in a later phase.
+1. **`ProBaselineService`** loads every pro row and computes the **median** of
+   each metric (even counts average the two middle values). The median, not the
+   mean, keeps one outlier pro from skewing the baseline.
+2. **`CoachService`** compares your row against that baseline. For each metric
+   where you're *below* baseline it emits a `Suggestion` carrying the gap as a
+   fraction (`(baseline − you) / baseline`) and a hand-written tip. Metrics at or
+   above baseline are skipped, and suggestions are sorted biggest-gap-first so
+   the card leads with what costs you the most.
+
+The tips are hand-tuned heuristics (e.g. a large headshot-% gap → "spend time on
+aim training"), not learned — see the `// ponytail:` note in `CoachService` for
+the upgrade path to a trained model. The seed data encodes the pattern to chase:
+pros survive longer *and* deal more damage, so staying alive isn't enough if the
+damage isn't there. With a blank `PUBG_API_KEY` the whole loop still runs
+end-to-end off seed data.
