@@ -10,7 +10,9 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertSame
+import kotlin.test.assertTrue
 
 class StatsIngestionServiceTest {
 
@@ -83,5 +85,43 @@ class StatsIngestionServiceTest {
         val results = service.ingestAll()
 
         assertEquals(listOf("you" to false, "proA" to true), results.map { it.playerName to it.isPro })
+    }
+
+    @Test
+    fun `refresh warns when no api key is configured`() {
+        val service = StatsIngestionService(client, repository, props.copy(apiKey = ""))
+
+        val warning = service.refresh()
+
+        assertTrue(warning!!.contains("API key"))
+        verify(client, never()).fetchPlayerSummary(any())
+    }
+
+    @Test
+    fun `refresh warns when a player cannot be refreshed and has no cache`() {
+        val service = StatsIngestionService(client, repository, props.copy(apiKey = "k"))
+        `when`(repository.findFirstByPlayerNameOrderByFetchedAtDesc(any())).thenReturn(null)
+        // "you" fetches fine; "proA" fails (client swallows the error and returns null).
+        `when`(client.fetchPlayerSummary("you")).thenReturn(
+            PlayerStatsSummary("you", 1.0, 1, 0.0, 0.0, 0.0)
+        )
+        `when`(client.fetchPlayerSummary("proA")).thenReturn(null)
+        `when`(repository.save(any())).thenAnswer { it.getArgument(0) }
+
+        val warning = service.refresh()
+
+        assertTrue(warning!!.contains("1 of 2"))
+    }
+
+    @Test
+    fun `refresh returns null when all players succeed`() {
+        val service = StatsIngestionService(client, repository, props.copy(apiKey = "k"))
+        `when`(repository.findFirstByPlayerNameOrderByFetchedAtDesc(any())).thenReturn(null)
+        `when`(client.fetchPlayerSummary(any())).thenAnswer {
+            PlayerStatsSummary(it.getArgument(0), 1.0, 1, 0.0, 0.0, 0.0)
+        }
+        `when`(repository.save(any())).thenAnswer { it.getArgument(0) }
+
+        assertNull(service.refresh())
     }
 }

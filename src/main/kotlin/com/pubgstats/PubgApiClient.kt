@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClientException
 
 /** Internal summary mapped from PUBG lifetime stats, ready to persist as [PlayerStats]. */
 data class PlayerStatsSummary(
@@ -59,6 +60,10 @@ class PubgApiClient(props: PubgApiProperties) {
         null
     } catch (e: HttpClientErrorException.TooManyRequests) {
         log.warn("PUBG API 429 rate limited while handling '{}' — skipping", name)
+        null
+    } catch (e: RestClientException) {
+        // Bad/missing API key (401/403), network errors, malformed responses — never fatal.
+        log.warn("PUBG API call failed for '{}': {}", name, e.message)
         null
     }
 

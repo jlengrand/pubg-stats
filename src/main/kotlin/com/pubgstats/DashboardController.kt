@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
@@ -37,8 +38,8 @@ class DashboardController(
 
     /** Force re-ingestion (still respects the cache TTL), then back to the dashboard. */
     @PostMapping("/refresh")
-    fun refresh(): String {
-        ingestion.ingestAll()
+    fun refresh(redirect: RedirectAttributes): String {
+        ingestion.refresh()?.let { redirect.addFlashAttribute("banner", it) }
         return "redirect:/"
     }
 }

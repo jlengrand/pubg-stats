@@ -21,6 +21,23 @@ class StatsIngestionService(
     fun ingestAll(): List<PlayerStats> =
         props.players.mapIndexedNotNull { index, name -> ingest(name, isPro = index != 0) }
 
+    /**
+     * Ingest all players for a user-triggered refresh. Returns a human-readable warning to show as a
+     * dashboard banner, or null on full success. The API client swallows per-player failures, so a
+     * failure surfaces as fewer results than configured players (no cached row to fall back on).
+     */
+    fun refresh(): String? {
+        if (props.apiKey.isBlank()) {
+            return "No PUBG API key configured — showing any cached data. Set PUBG_API_KEY in your .env and restart."
+        }
+        val missing = props.players.size - ingestAll().size
+        return if (missing > 0) {
+            "$missing of ${props.players.size} player(s) could not be refreshed (unknown handle, rate limit, or network) — showing cached data where available."
+        } else {
+            null
+        }
+    }
+
     /** Reuse the freshest cached row if within TTL, else fetch, map and save. Returns null if unavailable. */
     fun ingest(name: String, isPro: Boolean): PlayerStats? {
         val ttl = Duration.ofHours(props.cacheTtlHours)

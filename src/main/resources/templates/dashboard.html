@@ -14,6 +14,13 @@
         <button type="submit">Refresh stats</button>
     </form>
 
+    <div class="banner" th:if="${banner}" th:text="${banner}">Heads up.</div>
+
+    <section class="card empty" th:if="${you == null}">
+        <h2>No stats yet</h2>
+        <p class="meta">Nothing has been ingested for your player. Click <strong>Refresh stats</strong> to pull data from the PUBG API.</p>
+    </section>
+
     <section class="card" th:if="${you}">
         <div class="card-head">
             <h2 th:text="${you.playerName}">you</h2>
@@ -50,7 +57,8 @@
 
     <section class="card">
         <h2>Pros</h2>
-        <div class="table-scroll">
+        <p class="meta" th:if="${pros.isEmpty()}">No pro data yet — add pro handles to the configured player list and refresh.</p>
+        <div class="table-scroll" th:if="${!pros.isEmpty()}">
             <table>
                 <thead>
                 <tr>
