@@ -1,15 +1,28 @@
 package com.pubgstats
 
+import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.stereotype.Component
 import java.time.Instant
 
-// ponytail: dev/sample seed data so the app runs with zero external calls.
-// Gate behind a profile or remove once real PUBG ingestion lands in Phase 02.
+// ponytail: no PUBG_API_KEY → sample seed data so the app runs with zero external calls.
+// With a key set, we skip the fixtures and pull real stats via StatsIngestionService.
 @Component
-class DataSeeder(private val repository: PlayerStatsRepository) : ApplicationRunner {
+class DataSeeder(
+    private val repository: PlayerStatsRepository,
+    private val ingestion: StatsIngestionService,
+    private val props: PubgApiProperties,
+) : ApplicationRunner {
+    private val log = LoggerFactory.getLogger(javaClass)
+
     override fun run(args: ApplicationArguments?) {
+        if (props.apiKey.isNotBlank()) {
+            log.info("PUBG_API_KEY set — ingesting real stats for {} player(s)", props.players.size)
+            ingestion.ingestAll()
+            return
+        }
+        log.info("PUBG_API_KEY blank — using sample seed data")
         if (repository.count() > 0) return
         val now = Instant.now()
         repository.saveAll(
